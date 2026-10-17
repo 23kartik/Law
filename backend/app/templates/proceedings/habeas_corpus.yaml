@@ -1,0 +1,31 @@
+id: habeas_corpus
+name: "Habeas Corpus Writ Petition (Article 226)"
+case_type: habeas_corpus
+applicable_courts: [delhi_hc]
+petition_title_template: >-
+  PETITION UNDER ARTICLE 226 OF THE CONSTITUTION OF INDIA FOR ISSUANCE OF A
+  WRIT OF HABEAS CORPUS FOR PRODUCTION OF THE DETENU AND FOR A DECLARATION
+  THAT HIS/HER ARREST AND DETENTION IS ILLEGAL AND UNCONSTITUTIONAL
+sections:
+  - key: parties
+    heading: "1. DESCRIPTION OF PARTIES"
+  - key: synopsis
+    heading: "2. SYNOPSIS"
+  - key: list_of_dates
+    heading: "3. LIST OF DATES"
+  - key: jurisdiction
+    heading: "4. JURISDICTION AND MAINTAINABILITY"
+  - key: facts
+    heading: "5. FACTS"
+  - key: grounds
+    heading: "6. GROUNDS"
+  - key: reservation
+    heading: "7. RESERVATION AS TO REMEDIES"
+  - key: annexures
+    heading: "8. ANNEXURES"
+  - key: prayer
+    heading: "9. PRAYER"
+  - key: verification
+    heading: "VERIFICATION"
+  - key: affidavit
+    heading: "AFFIDAVIT"
