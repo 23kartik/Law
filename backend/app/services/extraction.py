@@ -12,8 +12,15 @@ not given, simply omit it (leave the field null or the list empty) rather than g
 downstream validation will flag what's missing. Dates must be in YYYY-MM-DD format if a full
 date is given; if only a relative/partial time reference is given (e.g. "last 24 hours"),
 leave the date field null and put the raw reference in the description instead.
-Classify case_type as "habeas_corpus" if the matter concerns someone detained/arrested whose
-production or release is sought; otherwise "other"."""
+Classify case_type as one of: "habeas_corpus" (someone is detained/arrested and their
+production/release is sought), "mandamus" (a public authority has failed to perform a legal
+duty), "prohibition" (a lower court/tribunal is proceeding beyond its jurisdiction),
+"certiorari" (an unlawful order, such as an FIR, has already been passed and quashing is
+sought), "quo_warranto" (a person's authority to hold a public office is challenged), or
+"other" if none of these fit. If the input mentions an FIR/case crime number or the number of
+an order being challenged, extract it into case_reference_number. If the input names a specific
+public authority, official, tribunal, or office at the centre of the dispute (other than a
+police station, which has its own field), extract it into authority_name."""
 
 
 def extract_text_from_pdf(pdf_bytes: bytes) -> str:

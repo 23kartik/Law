@@ -26,7 +26,9 @@ def _build_queries(facts: CaseFacts) -> list[str]:
 
 
 class _PrecedentAssessment(BaseModel):
-    title: str
+    index: int  # 1-based position in the "Candidate precedents" list below — never the title,
+    # since an LLM-reproduced title can drift (whitespace/punctuation/truncation) from the
+    # original and silently fail to match, leaving relevance_score stuck at its 0.0 default.
     relevance_score: float = Field(ge=0, le=1)
     applicability_note: str
 
@@ -39,10 +41,12 @@ class _ResearchAnalysis(BaseModel):
 _ANALYSIS_SYSTEM_INSTRUCTION = """You are a legal research analyst comparing a current case
 against candidate precedents retrieved from real court sources. For each precedent, score how
 applicable it is to the current case's facts and legal issues (0 = irrelevant, 1 = directly
-on point) and write one sentence on why. Then write up to 5 overall findings synthesizing what
-the available precedents suggest for this case. Ground every statement strictly in the
-provided case facts and precedent snippets — do not assume facts not given, and do not cite
-any case not present in the provided precedent list."""
+on point) and write one sentence on why — identify each precedent by its index number (1-based
+position in the "Candidate precedents" list), not its title. Then write up to 5 overall
+findings synthesizing what the available precedents suggest for this case. Ground every
+statement strictly in the provided case facts and precedent snippets — do not assume facts not
+given, and do not cite any case not present in the provided precedent list. Score and return
+every precedent in the list — do not skip any."""
 
 
 async def _assess_precedents(facts: CaseFacts, precedents: list[Precedent]) -> _ResearchAnalysis:
@@ -56,7 +60,8 @@ async def _assess_precedents(facts: CaseFacts, precedents: list[Precedent]) -> _
             ]
         )
     precedent_blob = "\n\n".join(
-        f"- {p.title} | court: {p.court} | date: {p.date}\n  snippet: {p.snippet}" for p in precedents
+        f"{idx}. {p.title} | court: {p.court} | date: {p.date}\n  snippet: {p.snippet}"
+        for idx, p in enumerate(precedents, start=1)
     )
     prompt = (
         f"Case facts:\n{facts.model_dump_json(indent=2)}\n\n"
@@ -115,9 +120,9 @@ async def run_research(
     precedents = list(merged.values())
 
     analysis = await _assess_precedents(facts, precedents)
-    assessment_by_title = {a.title.strip().lower(): a for a in analysis.precedent_assessments}
-    for p in precedents:
-        match = assessment_by_title.get(p.title.strip().lower())
+    assessment_by_index = {a.index: a for a in analysis.precedent_assessments}
+    for idx, p in enumerate(precedents, start=1):
+        match = assessment_by_index.get(idx)
         if match:
             p.relevance_score = match.relevance_score
             p.applicability_note = match.applicability_note

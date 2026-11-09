@@ -5,13 +5,22 @@ Two modules, per the requirement doc:
 1. **Legal Research** — validate case input → fetch real precedents from court sources →
    compare against the case → confidence-scored research report, every claim tagged
    `VERIFIED_COURT` / `EXTRACTED` / `AI_ANALYSIS`.
-2. **Legal Drafting** — pick a target court → re-validate → pull precedents → generate a
-   court-specific draft with missing facts bracketed as placeholders and anything needing
-   verification flagged, never fabricated.
+2. **Legal Drafting** — the system suggests which of the five writ petition categories
+   (Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto) fits the case facts,
+   with reasoning and a confidence score (`AI_ANALYSIS`, always reviewable/overridable) →
+   pick a target court → re-validate → pull precedents → generate a court- and
+   category-specific draft with missing facts bracketed as placeholders and anything
+   needing verification flagged, never fabricated → the draft stays editable
+   section-by-section and is explicitly approved before being treated as final.
 
-MVP covers one fully-built court + proceeding: **Delhi High Court — Habeas Corpus writ
-petition (Article 226)**, matching the structure of the sample draft. Adding another
-court/proceeding is a new YAML file in `backend/app/templates/`, not a code change.
+Two courts and all five writ categories are wired up: **Delhi High Court** and the
+**High Court of Judicature at Allahabad (Lucknow Bench)**, the latter matching the
+structure of the sample Certiorari/FIR-quashing draft. Adding another court/proceeding
+is a new YAML file in `backend/app/templates/`, not a code change.
+
+Supporting documents (annexures) can be attached to or detached from a case at any point
+via the draft review screen — this is a single-user MVP with no auth (see below), so there
+is no separate admin role; any user has this capability.
 
 ## Setup
 
@@ -56,13 +65,16 @@ cd backend && source venv/bin/activate && pytest   # 10 tests, no API keys neede
 
 Then, with both servers running and `GEMINI_API_KEY` set, walk through the wizard in the
 browser: paste the example narrative ("My brother has been detained by Karlobag Police…") or
-upload a PDF → review/complete the extracted facts → run research → pick Delhi HC / Habeas
-Corpus → generate the draft → download the `.docx`.
+upload a PDF → review/complete the extracted facts, including the AI-suggested writ category
+→ run research → pick a court/proceeding → generate the draft → edit sections and attach
+supporting documents as needed → approve → download the `.docx`.
 
 ## What's deliberately out of scope for this MVP
 
-- Only one court + proceeding template is built out (see `backend/app/templates/`).
-- No auth, single-user, local SQLite (`backend/law.db`).
+- Only two courts are built out (see `backend/app/templates/`), though all five writ
+  categories are covered for both.
+- No auth, single-user, local SQLite (`backend/law.db`) — "admin" document attach/detach
+  is available to the single user rather than gated behind a separate role.
 - DOCX export matches the structure, not exact court-mandated pagination/margin rules.
 - `kanoon.dev` coverage is a pilot sample — treat it as a bonus source, not primary, until
   you're on the paid Indian Kanoon tier.

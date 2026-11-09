@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.routers import case, courts, draft, research
+from app.routers import case, courts, documents, draft, precedents, research
 
 app = FastAPI(title="Legal Advocacy Platform API", version="0.1.0")
 
@@ -19,6 +19,8 @@ app.include_router(case.router)
 app.include_router(research.router)
 app.include_router(courts.router)
 app.include_router(draft.router)
+app.include_router(documents.router)
+app.include_router(precedents.router)
 
 
 @app.get("/api/health")

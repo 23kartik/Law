@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 
 from app import repository
-from app.models.draft import DraftOutput, DraftRequest
+from app.models.draft import DraftEditRequest, DraftOutput, DraftRequest
+from app.models.enums import DraftStatus
 from app.services import templates
 from app.services.drafting import generate_draft
 from app.services.export import draft_to_docx
@@ -36,7 +37,14 @@ async def create_draft(case_id: str, body: DraftRequest) -> DraftOutput:
         research = await run_research(facts, issues, court_filter=["supremecourt", "highcourts"])
         repository.save_research_report(case_id, research)
 
-    draft = await generate_draft(facts, research, body.court_id, body.proceeding_type)
+    # If the user has curated a set of precedents onto the case, cite only those — that's
+    # the point of attaching. Otherwise fall back to everything research turned up.
+    attached = repository.list_attached_precedents(case_id)
+    precedents = list(attached) if attached else research.precedents
+
+    draft = await generate_draft(
+        facts, precedents, research.confidence_score, body.court_id, body.proceeding_type
+    )
     repository.save_draft_output(case_id, draft)
     return draft
 
@@ -49,6 +57,38 @@ async def get_draft(case_id: str) -> DraftOutput:
     draft = repository.load_draft_output(row)
     if draft is None:
         raise HTTPException(status_code=404, detail="No draft generated for this case yet.")
+    return draft
+
+
+@router.patch("/{case_id}/draft", response_model=DraftOutput)
+async def edit_draft(case_id: str, body: DraftEditRequest) -> DraftOutput:
+    """Saves user edits to the draft's sections. A draft stays editable after a prior
+    approval too — editing it again reverts its status to 'draft' so it's clear the
+    approved text and the current text may now differ."""
+    row = repository.get_case(case_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Case not found.")
+    draft = repository.load_draft_output(row)
+    if draft is None:
+        raise HTTPException(status_code=404, detail="No draft generated for this case yet.")
+
+    draft.sections = body.sections
+    draft.status = DraftStatus.DRAFT
+    repository.save_draft_output(case_id, draft)
+    return draft
+
+
+@router.post("/{case_id}/draft/approve", response_model=DraftOutput)
+async def approve_draft(case_id: str) -> DraftOutput:
+    row = repository.get_case(case_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Case not found.")
+    draft = repository.load_draft_output(row)
+    if draft is None:
+        raise HTTPException(status_code=404, detail="No draft generated for this case yet.")
+
+    draft.status = DraftStatus.APPROVED
+    repository.save_draft_output(case_id, draft)
     return draft
 
 

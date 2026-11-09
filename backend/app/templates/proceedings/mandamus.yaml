@@ -1,0 +1,31 @@
+id: mandamus
+name: "Mandamus Writ Petition (Article 226)"
+case_type: mandamus
+applicable_courts: [delhi_hc, allahabad_hc]
+petition_title_template: >-
+  WRIT PETITION UNDER ARTICLE 226 OF THE CONSTITUTION OF INDIA FOR ISSUANCE
+  OF A WRIT OF MANDAMUS DIRECTING THE RESPONDENT AUTHORITY TO PERFORM ITS
+  LEGAL/PUBLIC DUTY, AND FOR ANCILLARY RELIEFS
+sections:
+  - key: parties
+    heading: "1. DESCRIPTION OF PARTIES"
+  - key: synopsis
+    heading: "2. SYNOPSIS"
+  - key: list_of_dates
+    heading: "3. LIST OF DATES"
+  - key: jurisdiction
+    heading: "4. JURISDICTION AND MAINTAINABILITY"
+  - key: facts
+    heading: "5. FACTS"
+  - key: grounds
+    heading: "6. GROUNDS"
+  - key: reservation
+    heading: "7. RESERVATION AS TO REMEDIES"
+  - key: annexures
+    heading: "8. ANNEXURES"
+  - key: prayer
+    heading: "9. PRAYER"
+  - key: verification
+    heading: "VERIFICATION"
+  - key: affidavit
+    heading: "AFFIDAVIT"

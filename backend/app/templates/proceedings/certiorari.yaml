@@ -1,0 +1,31 @@
+id: certiorari
+name: "Certiorari Writ Petition (Article 226) — Quashing of Impugned Order/FIR"
+case_type: certiorari
+applicable_courts: [delhi_hc, allahabad_hc]
+petition_title_template: >-
+  WRIT PETITION UNDER ARTICLE 226 OF THE CONSTITUTION OF INDIA FOR ISSUANCE
+  OF A WRIT OF CERTIORARI QUASHING THE IMPUGNED ORDER/FIRST INFORMATION
+  REPORT, AND FOR ANCILLARY RELIEFS INCLUDING INTERIM PROTECTION
+sections:
+  - key: parties
+    heading: "1. DESCRIPTION OF PARTIES"
+  - key: synopsis
+    heading: "2. SYNOPSIS"
+  - key: list_of_dates
+    heading: "3. LIST OF DATES AND EVENTS"
+  - key: jurisdiction
+    heading: "4. JURISDICTION AND MAINTAINABILITY"
+  - key: facts
+    heading: "5. FACTS"
+  - key: grounds
+    heading: "6. GROUNDS"
+  - key: reservation
+    heading: "7. RESERVATION AS TO REMEDIES"
+  - key: annexures
+    heading: "8. ANNEXURES"
+  - key: prayer
+    heading: "9. PRAYER"
+  - key: verification
+    heading: "VERIFICATION"
+  - key: affidavit
+    heading: "AFFIDAVIT"

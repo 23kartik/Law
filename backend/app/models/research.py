@@ -36,3 +36,26 @@ class ResearchReport(BaseModel):
     confidence_score: float
     confidence_breakdown: ConfidenceBreakdown
     generated_at: str
+
+
+class AttachedPrecedent(Precedent):
+    """A precedent the user has curated onto the case — either picked from the research
+    results or typed in manually. When any precedents are attached, drafting cites only
+    these instead of the full (unfiltered) research results."""
+
+    id: str
+    attach_source: str  # "research" | "manual"
+    attached_at: str
+
+
+class ManualPrecedentInput(BaseModel):
+    """A precedent the user knows about but that wasn't surfaced by research — entered by
+    hand, so it's tagged EXTRACTED (user-supplied, not independently verified by the
+    platform against a court source), never VERIFIED_COURT."""
+
+    title: str
+    citation: str | None = None
+    court: str | None = None
+    date: str | None = None
+    source_url: str | None = None
+    note: str | None = None

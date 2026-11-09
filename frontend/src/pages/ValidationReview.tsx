@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getCase, runResearch, updateCaseFacts } from '../api/client'
+import { getCase, runResearch, suggestCategory, updateCaseFacts } from '../api/client'
 import type { CaseFacts, KeyDate, Party } from '../api/types'
 import { StepNav } from '../components/StepNav'
 import { TierBadge } from '../components/TierBadge'
 import { IssuesList } from '../components/IssuesList'
+import { CategoryPicker } from '../components/CategoryPicker'
 
 function emptyParty(): Party {
   return { role: '', name: '', relationship: '', details: '' }
@@ -39,6 +40,18 @@ export function ValidationReview() {
     },
   })
 
+  const resuggestMutation = useMutation({
+    mutationFn: async () => {
+      if (facts) await updateCaseFacts(caseId!, facts)
+      return suggestCategory(caseId!)
+    },
+    onSuccess: (suggestion) => {
+      queryClient.setQueryData(['case', caseId], (prev: typeof query.data) =>
+        prev ? { ...prev, category_suggestion: suggestion } : prev,
+      )
+    },
+  })
+
   const researchMutation = useMutation({
     mutationFn: async () => {
       if (facts) await updateCaseFacts(caseId!, facts)
@@ -69,6 +82,17 @@ export function ValidationReview() {
       <section className="mt-6">
         <h2 className="font-ui mb-2 text-sm font-semibold text-gray-700">Validation issues</h2>
         <IssuesList issues={query.data?.validation_issues ?? []} />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="font-ui mb-2 text-sm font-semibold text-gray-700">Writ petition category</h2>
+        <CategoryPicker
+          suggestion={query.data?.category_suggestion ?? null}
+          value={facts.case_type}
+          onChange={(category) => updateField('case_type', category)}
+          onResuggest={() => resuggestMutation.mutate()}
+          resuggesting={resuggestMutation.isPending}
+        />
       </section>
 
       <section className="mt-8 space-y-4">
@@ -188,6 +212,28 @@ export function ValidationReview() {
             className="font-ui w-full rounded border border-gray-300 p-2 text-sm"
             value={facts.police_station ?? ''}
             onChange={(e) => updateField('police_station', e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="font-ui mb-1 block text-sm font-semibold text-gray-700">
+            FIR/Case Crime No. or impugned order no.
+          </label>
+          <input
+            className="font-ui w-full rounded border border-gray-300 p-2 text-sm"
+            placeholder="e.g. Case Crime No. 0341 of 2026"
+            value={facts.case_reference_number ?? ''}
+            onChange={(e) => updateField('case_reference_number', e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="font-ui mb-1 block text-sm font-semibold text-gray-700">
+            Respondent authority/office/tribunal
+          </label>
+          <input
+            className="font-ui w-full rounded border border-gray-300 p-2 text-sm"
+            placeholder="e.g. Principal Secretary, Department of Home"
+            value={facts.authority_name ?? ''}
+            onChange={(e) => updateField('authority_name', e.target.value)}
           />
         </div>
       </section>

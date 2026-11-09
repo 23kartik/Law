@@ -21,5 +21,17 @@ class Severity(str, Enum):
 
 
 class CaseType(str, Enum):
+    """Also doubles as the writ petition category: the five categories listed in the
+    product requirement, plus OTHER for matters that genuinely fit none of them."""
+
     HABEAS_CORPUS = "habeas_corpus"
+    MANDAMUS = "mandamus"
+    PROHIBITION = "prohibition"
+    CERTIORARI = "certiorari"
+    QUO_WARRANTO = "quo_warranto"
     OTHER = "other"
+
+
+class DraftStatus(str, Enum):
+    DRAFT = "draft"
+    APPROVED = "approved"

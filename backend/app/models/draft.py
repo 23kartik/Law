@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from app.models.enums import Severity, Tier
+from app.models.enums import DraftStatus, Severity, Tier
 
 
 class ContentBlock(BaseModel):
@@ -32,4 +32,11 @@ class DraftOutput(BaseModel):
     sections: list[DraftSection] = Field(default_factory=list)
     flagged_issues: list[FlaggedIssue] = Field(default_factory=list)
     confidence_score: float
+    status: DraftStatus = DraftStatus.DRAFT
     generated_at: str
+
+
+class DraftEditRequest(BaseModel):
+    """Payload for saving user edits to a generated draft before final approval."""
+
+    sections: list[DraftSection]

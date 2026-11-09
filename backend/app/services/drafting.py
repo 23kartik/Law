@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from app.models.case import CaseFacts
 from app.models.draft import ContentBlock, DraftOutput, DraftSection, FlaggedIssue
 from app.models.enums import Severity, Tier
-from app.models.research import Precedent, ResearchReport
+from app.models.research import Precedent
 from app.services import templates
 from app.services.llm import generate_structured
 from app.services.validation import check_required_fields
@@ -94,7 +94,8 @@ def _precedents_blob(precedents: list[Precedent]) -> str:
 
 async def generate_draft(
     facts: CaseFacts,
-    research: ResearchReport | None,
+    precedents: list[Precedent],
+    confidence_score: float,
     court_id: str,
     proceeding_type: str,
 ) -> DraftOutput:
@@ -102,7 +103,6 @@ async def generate_draft(
     proceeding = templates.get_proceeding_template(proceeding_type)
 
     required_field_issues = check_required_fields(facts)
-    precedents = research.precedents if research else []
 
     section_spec = "\n".join(f"- key: {s['key']}, heading: {s['heading']}" for s in proceeding["sections"])
 
@@ -157,8 +157,6 @@ Available precedents (only cite from this list, never invent a citation):
                 section=None,
             )
         )
-
-    confidence_score = research.confidence_score if research else 0.0
 
     return DraftOutput(
         court_id=court_id,

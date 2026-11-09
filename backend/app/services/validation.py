@@ -18,6 +18,29 @@ _REQUIRED_FIELDS: dict[CaseType, list[tuple[str, str]]] = {
         ("arrest_date", "Date and time of arrest/detention"),
         ("facts_narrative", "Narrative of facts"),
     ],
+    CaseType.CERTIORARI: [
+        ("parties.petitioner", "Petitioner's full name, parentage, age and address"),
+        ("case_reference_number", "FIR/Case Crime No. or number of the impugned order to be quashed"),
+        ("police_station", "Police station or authority that passed the impugned order"),
+        ("location", "District/place where the impugned order was passed"),
+        ("facts_narrative", "Narrative of facts"),
+    ],
+    CaseType.MANDAMUS: [
+        ("parties.petitioner", "Petitioner's full name, parentage, age and address"),
+        ("authority_name", "The government authority/public official whose duty is sought to be enforced"),
+        ("legal_issues", "The specific legal/public duty the authority has failed to perform"),
+        ("facts_narrative", "Narrative of facts"),
+    ],
+    CaseType.PROHIBITION: [
+        ("parties.petitioner", "Petitioner's full name, parentage, age and address"),
+        ("authority_name", "The lower court/tribunal proceeding in excess of its jurisdiction"),
+        ("facts_narrative", "Narrative of facts"),
+    ],
+    CaseType.QUO_WARRANTO: [
+        ("parties.petitioner", "Petitioner's full name, parentage, age and address"),
+        ("authority_name", "The public office in question and/or the office-holder whose authority is challenged"),
+        ("facts_narrative", "Narrative of facts"),
+    ],
 }
 
 
@@ -49,6 +72,12 @@ def check_required_fields(facts: CaseFacts) -> list[ValidationIssue]:
             present = _has_date(facts, "arrest")
         elif field == "facts_narrative":
             present = bool(facts.facts_narrative.strip())
+        elif field == "case_reference_number":
+            present = bool(facts.case_reference_number)
+        elif field == "authority_name":
+            present = bool(facts.authority_name)
+        elif field == "legal_issues":
+            present = bool(facts.legal_issues)
 
         if not present:
             issues.append(

@@ -2,7 +2,38 @@ export type Tier = 'VERIFIED_COURT' | 'EXTRACTED' | 'AI_ANALYSIS'
 
 export type Severity = 'missing' | 'conflicting' | 'unsupported' | 'needs_review'
 
-export type CaseType = 'habeas_corpus' | 'other'
+export type DraftStatus = 'draft' | 'approved'
+
+export type CaseType =
+  | 'habeas_corpus'
+  | 'mandamus'
+  | 'prohibition'
+  | 'certiorari'
+  | 'quo_warranto'
+  | 'other'
+
+export const WRIT_CATEGORY_LABELS: Record<CaseType, string> = {
+  habeas_corpus: 'Habeas Corpus',
+  mandamus: 'Mandamus',
+  prohibition: 'Prohibition',
+  certiorari: 'Certiorari',
+  quo_warranto: 'Quo Warranto',
+  other: 'Other / none of the above',
+}
+
+export const WRIT_CATEGORY_DESCRIPTIONS: Record<CaseType, string> = {
+  habeas_corpus:
+    'A person is allegedly detained illegally — seeks production of the detained person before the court and appropriate relief.',
+  mandamus:
+    'A government authority or public official has failed to perform a legal or public duty — seeks a court direction to perform it.',
+  prohibition:
+    'A lower court or tribunal is proceeding beyond its legal authority — seeks to stop it before it decides the matter.',
+  certiorari:
+    'A lower court, tribunal, or authority has already passed an unlawful order (e.g. an FIR) — seeks to quash it.',
+  quo_warranto:
+    "A person's legal authority to hold a public office is in question — seeks to challenge their right to hold it.",
+  other: 'The matter does not fit any of the five writ categories above.',
+}
 
 export interface Party {
   role: string
@@ -23,6 +54,8 @@ export interface CaseFacts {
   key_dates: KeyDate[]
   location: string | null
   police_station: string | null
+  case_reference_number: string | null
+  authority_name: string | null
   facts_narrative: string
   legal_issues: string[]
   missing_fields: string[]
@@ -35,12 +68,29 @@ export interface ValidationIssue {
   tier: Tier
 }
 
+export interface CategorySuggestion {
+  category: CaseType
+  confidence: number
+  reasoning: string
+  tier: Tier
+}
+
 export interface CaseRecord {
   id: string
   raw_text: string
   case_facts: CaseFacts
   validation_issues: ValidationIssue[]
+  category_suggestion: CategorySuggestion | null
   created_at: string
+}
+
+export interface CaseDocument {
+  id: string
+  filename: string
+  content_type: string
+  size: number
+  annexure_label: string | null
+  uploaded_at: string
 }
 
 export interface Precedent {
@@ -78,6 +128,21 @@ export interface ResearchReport {
   generated_at: string
 }
 
+export interface AttachedPrecedent extends Precedent {
+  id: string
+  attach_source: 'research' | 'manual'
+  attached_at: string
+}
+
+export interface ManualPrecedentInput {
+  title: string
+  citation: string | null
+  court: string | null
+  date: string | null
+  source_url: string | null
+  note: string | null
+}
+
 export interface ContentBlock {
   text: string
   tier: Tier
@@ -102,6 +167,7 @@ export interface DraftOutput {
   sections: DraftSection[]
   flagged_issues: FlaggedIssue[]
   confidence_score: number
+  status: DraftStatus
   generated_at: string
 }
 
